@@ -43,7 +43,7 @@ For _key_, the plugin supports either way;
    type redis_store
    key userdata
    ```
-   
+
 2. Lookup a key string in every event data by a lookup path.  
    If event data have structured data like
 
@@ -134,10 +134,11 @@ No more options than common options.
 
 ### `zset` storage specific options
 
-| Key            | Type   | Default                  | Description                                  |
-| :----          | :----- | :----------------------- | :------------                                |
-| `score_path`   | string | (_time_ of log event)    | path to lookup for _score_ in the event data |
-| `value_expire` | int    |                          | value expiration in seconds                  |
+| Key                 | Type   | Default                  | Description                                                             |
+| :----               | :----- | :----------------------- | :------------                                                           |
+| `score_path`        | string | (_time_ of log event)    | path to lookup for _score_ in the event data                            |
+| `collision_policy`  | string | (nil)                    | Only update elements that already exist (XX) or add a new element (NX)  |
+| `value_expire`      | int    |                          | value expiration in seconds                                             |
 
 If `value_expire` is set, the plugin assumes that the _score_ in the **SortedSet** is
 based on *timestamp* and it deletes expired _members_ every after new event data arrives.
