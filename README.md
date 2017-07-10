@@ -8,9 +8,9 @@ Redis Output Plugin For fluentd
 Background
 ----------
 
-This is folked project from [fluent-plugin-redisstore][].
+This is forked project from [fluent-plugin-redis-store][].
 
-[fluent-plugin-redisstore]: https://github.com/moaikids/fluent-plugin-redisstore
+[fluent-plugin-redis-store]: https://github.com/pokehanai/fluent-plugin-redis-store
 
 Features
 --------
@@ -83,7 +83,12 @@ To determine what _value_ in every event data to be srtored, you have two option
 Installation
 ------------
 
-    /usr/lib64/fluent/ruby/bin/fluent-gem install fluent-plugin-redis-store
+```bash
+fluent-gem install fluent-plugin-redis-store-gabfl
+
+# or if you are using td-agent:
+td-agent-gem install fluent-plugin-redis-store-gabfl
+```
 
 Configuration
 -------------
