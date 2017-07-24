@@ -30,6 +30,7 @@ module Fluent
       super
       require 'redis'
       require 'msgpack'
+      require 'logger'
     end
 
     def configure(conf)
@@ -49,6 +50,8 @@ module Fluent
         @redis = Redis.new(:host => @host, :port => @port, :password => @password,
                            :timeout => @timeout, :thread_safe => true, :db => @db)
       end
+
+      @logger = Logger.new('/var/log/td-agent/fluentd_outredis.log')
     end
 
     def shutdown
@@ -79,6 +82,10 @@ module Fluent
                   operation_for_publish(record)
                 end
               rescue NoMethodError => e
+                puts e
+              rescue Encoding::UndefinedConversionError => e
+                @logger.error  { "Plugin error: " + e.to_s }
+                @logger.error  { "Original record: " + record.to_s }
                 puts e
               end
             }
