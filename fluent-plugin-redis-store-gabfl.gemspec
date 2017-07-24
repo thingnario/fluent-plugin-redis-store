@@ -2,7 +2,7 @@
 Gem::Specification.new do |gem|
     gem.name        = "fluent-plugin-redis-store-gabfl"
     gem.email       = "pypi@gab.lc"
-    gem.version     = "0.1.2"
+    gem.version     = "0.1.3"
     gem.authors     = ["moaikids", "HANAI Tohru aka pokehanai", "Gabriel Bordeaux"]
     gem.licenses    = ["Apache License Version 2.0"]
     gem.summary     = %q{Redis(zset/set/list/string/publish) output plugin for Fluentd}
