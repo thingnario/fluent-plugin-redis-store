@@ -65,7 +65,7 @@ class RedisStoreOutputTest < Test::Unit::TestCase
   end
 
   def create_driver(conf)
-    Fluent::Test::BufferedOutputTestDriver.new(Fluent::RedisStoreOutput).configure(conf)
+    Fluent::Test::Driver::Output.new(Fluent::Plugin::RedisStoreOutput).configure(conf)
   end
 
   def test_configure_defaults
@@ -134,16 +134,17 @@ class RedisStoreOutputTest < Test::Unit::TestCase
 #  def test_write
 #    d = create_driver(CONFIG1)
 #
-#    time = Time.parse("2011-01-02 13:14:15 UTC").to_i
-#    d.emit({ "foo" => "bar" }, time)
-#    d.run
+#    time = event_time("2011-01-02 13:14:15 UTC")
+#    d.run(default_tag 'test') do
+#      d.feed({ "foo" => "bar" }, time)
+#    end
 #
 #    assert_equal "test", $channel
 #    assert_equal(%Q[{"foo":"bar","time":#{time}}], $message)
 #  end
 
   def get_time
-    Time.parse("2011-01-02 13:14:15 UTC").to_i
+    event_time("2011-01-02 13:14:15 UTC")
   end
 
   # it should return whole message
@@ -159,8 +160,9 @@ class RedisStoreOutputTest < Test::Unit::TestCase
       'stat' => { 'attack' => 7 }
     }
     $ttl = nil
-    d.emit(message, get_time)
-    d.run
+    d.run(default_tag: 'test') do
+      d.feed(get_time, message)
+    end
 
     assert_equal "george", $key
     assert_equal message, $message
@@ -181,8 +183,9 @@ class RedisStoreOutputTest < Test::Unit::TestCase
       'stat' => { 'attack' => 7 }
     }
     $ttl = nil
-    d.emit(message, get_time)
-    d.run
+    d.run(default_tag: 'test') do
+      d.feed(get_time, message)
+    end
 
     assert_equal "george", $key
     assert_equal 7, $message
@@ -201,8 +204,9 @@ class RedisStoreOutputTest < Test::Unit::TestCase
       'stat' => { 'attack' => 7 }
     }
     $ttl = nil
-    d.emit(message, get_time)
-    d.run
+    d.run(default_tag: 'test') do
+      d.feed(get_time, message)
+    end
 
     assert_equal "george", $key
     assert_equal message.to_json, $message
@@ -220,8 +224,9 @@ class RedisStoreOutputTest < Test::Unit::TestCase
       'stat' => { 'attack' => 7 }
     }
     $ttl = nil
-    d.emit(message, get_time)
-    d.run
+    d.run(default_tag: 'test') do
+      d.feed(get_time, message)
+    end
 
     assert_equal "george", $key
     assert_equal message.to_msgpack, $message
@@ -238,8 +243,9 @@ class RedisStoreOutputTest < Test::Unit::TestCase
       'user' => 'george',
       'stat' => { 'attack' => 7 }
     }
-    d.emit(message, get_time)
-    d.run
+    d.run(default_tag: 'test') do
+      d.feed(get_time, message)
+    end
 
     assert_equal :rpush, $command
     assert_equal "george", $key
@@ -258,8 +264,9 @@ class RedisStoreOutputTest < Test::Unit::TestCase
       'user' => 'george',
       'stat' => { 'attack' => 7 }
     }
-    d.emit(message, get_time)
-    d.run
+    d.run(default_tag: 'test') do
+      d.feed(get_time, message)
+    end
 
     assert_equal :lpush, $command
     assert_equal "george", $key
@@ -278,8 +285,9 @@ class RedisStoreOutputTest < Test::Unit::TestCase
       'user' => 'george',
       'stat' => { 'attack' => 7 }
     }
-    d.emit(message, get_time)
-    d.run
+    d.run(default_tag: 'test') do
+      d.feed(get_time, message)
+    end
 
     assert_equal :sadd, $command
     assert_equal "george", $key
@@ -300,8 +308,9 @@ class RedisStoreOutputTest < Test::Unit::TestCase
       'stat' => { 'attack' => 7 },
       'result' => 81
     }
-    d.emit(message, get_time)
-    d.run
+    d.run(default_tag: 'test') do
+      d.feed(get_time, message)
+    end
 
     assert_equal :zadd, $command
     assert_equal "george", $key
@@ -322,8 +331,9 @@ class RedisStoreOutputTest < Test::Unit::TestCase
       'stat' => { 'attack' => 7 },
       'result' => 81
     }
-    d.emit(message, get_time)
-    d.run
+    d.run(default_tag: 'test') do
+      d.feed(get_time, message)
+    end
 
     assert_equal :zadd, $command
     assert_equal "george", $key
@@ -342,8 +352,9 @@ class RedisStoreOutputTest < Test::Unit::TestCase
     message = {
       'user' => 'george'
     }
-    d.emit(message, get_time)
-    d.run
+    d.run(default_tag: 'test') do
+      d.feed(get_time, message)
+    end
 
     assert_equal :publish, $command
     assert_equal "george", $channel
@@ -359,9 +370,10 @@ class RedisStoreOutputTest < Test::Unit::TestCase
 
     d = create_driver(config)
     message = { 'user' => 'george' }
-    d.emit(message, get_time)
     assert_raise(Fluent::ConfigError) do
-      d.run
+      d.run(default_tag: 'test') do
+        d.feed(get_time, message)
+      end
     end
   end
 end

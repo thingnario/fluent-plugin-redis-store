@@ -1,6 +1,12 @@
-module Fluent
-  class RedisStoreOutput < BufferedOutput
+require 'fluent/plugin/output'
+
+module Fluent::Plugin
+  class RedisStoreOutput < Output
     Fluent::Plugin.register_output('redis_store', self)
+
+    helpers :compat_parameters
+
+    DEFAULT_BUFFER_TYPE = "memory"
 
     # redis connection
     config_param :host,      :string,  :default => '127.0.0.1'
@@ -25,6 +31,10 @@ module Fluent
     config_param :order,          :string,  :default => 'asc'
     config_set_default :flush_interval, 1
 
+    config_section :buffer do
+      config_set_default :@type, DEFAULT_BUFFER_TYPE
+    end
+
     def initialize
       super
       require 'redis'
@@ -32,6 +42,7 @@ module Fluent
     end
 
     def configure(conf)
+      compat_parameters_convert(conf, :buffer)
       super
 
       if @key_path == nil and @key == nil
@@ -52,10 +63,19 @@ module Fluent
 
     def shutdown
       @redis.quit
+      super
     end
 
     def format(tag, time, record)
       [tag, time, record].to_msgpack
+    end
+
+    def formatted_to_msgpack_binary?
+      true
+    end
+
+    def multi_workers_ready?
+      true
     end
 
     def write(chunk)
