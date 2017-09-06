@@ -6,6 +6,7 @@ $channel = nil
 $message = nil
 
 class Redis
+  remove_method :pipelined, :set, :rpush, :lpush, :sadd, :zadd, :expire, :publish, :quit
   def initialize(options = {})
   end
 
@@ -74,24 +75,24 @@ class RedisStoreOutputTest < Test::Unit::TestCase
       score_path b
     ]
     d = create_driver(config)
-    assert_equal "127.0.0.1", d.instance.host
-    assert_equal 6379, d.instance.port
-    assert_equal nil, d.instance.path
-    assert_equal nil, d.instance.password
-    assert_equal 0, d.instance.db
-    assert_equal 5.0, d.instance.timeout
-    assert_equal 'json', d.instance.format_type
-    assert_equal '', d.instance.key_prefix
-    assert_equal '', d.instance.key_suffix
-    assert_equal 'zset', d.instance.store_type
-    assert_equal 'a', d.instance.key_path
-    assert_equal nil, d.instance.key
-    assert_equal 'b', d.instance.score_path
-    assert_equal '', d.instance.value_path
-    assert_equal -1, d.instance.key_expire
-    assert_equal -1, d.instance.value_expire
-    assert_equal -1, d.instance.value_length
-    assert_equal 'asc', d.instance.order
+    assert_equal("127.0.0.1", d.instance.host)
+    assert_equal(6379, d.instance.port)
+    assert_equal(nil, d.instance.path)
+    assert_equal(nil, d.instance.password)
+    assert_equal(0, d.instance.db)
+    assert_equal(5.0, d.instance.timeout)
+    assert_equal('json', d.instance.format_type)
+    assert_equal('', d.instance.key_prefix)
+    assert_equal('', d.instance.key_suffix)
+    assert_equal('zset', d.instance.store_type)
+    assert_equal('a', d.instance.key_path)
+    assert_equal(nil, d.instance.key)
+    assert_equal('b', d.instance.score_path)
+    assert_equal('', d.instance.value_path)
+    assert_equal(-1, d.instance.key_expire)
+    assert_equal(-1, d.instance.value_expire)
+    assert_equal(-1, d.instance.value_length)
+    assert_equal('asc', d.instance.order)
   end
 
   def test_configure_host_port_db
@@ -370,10 +371,30 @@ class RedisStoreOutputTest < Test::Unit::TestCase
 
     d = create_driver(config)
     message = { 'user' => 'george' }
-    assert_raise(Fluent::ConfigError) do
-      d.run(default_tag: 'test') do
-        d.feed(get_time, message)
+    suppress_output do
+      assert_raise(Fluent::ConfigError) do
+        d.run(default_tag: 'test') do
+          d.feed(get_time, message)
+        end
       end
     end
+  end
+
+  def suppress_output
+    begin
+      original_stderr = $stderr.clone
+      original_stdout = $stdout.clone
+      $stderr.reopen(File.new('/dev/null', 'w'))
+      $stdout.reopen(File.new('/dev/null', 'w'))
+      retval = yield
+    rescue Exception => e
+      $stdout.reopen(original_stdout)
+      $stderr.reopen(original_stderr)
+      raise e
+    ensure
+      $stdout.reopen(original_stdout)
+      $stderr.reopen(original_stderr)
+    end
+    retval
   end
 end

@@ -84,7 +84,7 @@ module Fluent::Plugin
           begin
             MessagePack::Unpacker.new(io).each { |message|
               begin
-                (tag, time, record) = message
+                (_, time, record) = message
                 case @store_type
                 when 'zset'
                   operation_for_zset(record, time)
