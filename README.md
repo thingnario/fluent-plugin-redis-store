@@ -153,6 +153,17 @@ based on *timestamp* and it deletes expired _members_ every after new event data
 No more options than common options.
 
 
+Contributors
+------------
+
+moaikids  
+HANAI tohru  
+Mohit Khanna  
+yamada-shinji  
+Heitor de Souza  
+Hiroshi Hatake  
+Gabriel Bordeaux  
+
 Copyright
 ---------
 
