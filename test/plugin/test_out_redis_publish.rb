@@ -1,12 +1,9 @@
 require 'helpers'
 
-require 'redis'
-
 $channel = nil
 $message = nil
 
 class Redis
-  remove_method :pipelined, :set, :rpush, :lpush, :sadd, :zadd, :expire, :publish, :quit
   def initialize(options = {})
   end
 

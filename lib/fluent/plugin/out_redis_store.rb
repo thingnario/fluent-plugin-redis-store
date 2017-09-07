@@ -37,7 +37,7 @@ module Fluent::Plugin
 
     def initialize
       super
-      require 'redis'
+      require 'redis' unless defined?(Redis) == 'constant'
       require 'msgpack'
     end
 
