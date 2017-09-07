@@ -67,7 +67,7 @@ module Fluent::Plugin
     end
 
     def format(tag, time, record)
-      [tag, time, record].to_msgpack
+      [tag, time.to_f, record].to_msgpack
     end
 
     def formatted_to_msgpack_binary?
