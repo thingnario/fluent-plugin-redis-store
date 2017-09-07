@@ -17,18 +17,19 @@ module Fluent::Plugin
     config_param :timeout,   :float,   :default => 5.0
 
     # redis command and parameters
-    config_param :format_type,    :string,  :default => 'json'
-    config_param :store_type,     :string,  :default => 'zset'
-    config_param :key_prefix,     :string,  :default => ''
-    config_param :key_suffix,     :string,  :default => ''
-    config_param :key,            :string,  :default => nil
-    config_param :key_path,       :string,  :default => nil
-    config_param :score_path,     :string,  :default => nil
-    config_param :value_path,     :string,  :default => ''
-    config_param :key_expire,     :integer, :default => -1
-    config_param :value_expire,   :integer, :default => -1
-    config_param :value_length,   :integer, :default => -1
-    config_param :order,          :string,  :default => 'asc'
+    config_param :format_type,       :string,  :default => 'json'
+    config_param :store_type,        :string,  :default => 'zset'
+    config_param :key_prefix,        :string,  :default => ''
+    config_param :key_suffix,        :string,  :default => ''
+    config_param :key,               :string,  :default => nil
+    config_param :key_path,          :string,  :default => nil
+    config_param :score_path,        :string,  :default => nil
+    config_param :value_path,        :string,  :default => ''
+    config_param :key_expire,        :integer, :default => -1
+    config_param :value_expire,      :integer, :default => -1
+    config_param :value_length,      :integer, :default => -1
+    config_param :order,             :string,  :default => 'asc'
+    config_param :collision_policy,  :string,  :default => nil
     config_set_default :flush_interval, 1
 
     config_section :buffer do
@@ -99,6 +100,10 @@ module Fluent::Plugin
                 end
               rescue NoMethodError => e
                 puts e
+              rescue Encoding::UndefinedConversionError => e
+                log.error "Plugin error: " + e.to_s
+                log.error "Original record: " + record.to_s
+                puts e
               end
             }
           rescue EOFError
@@ -112,7 +117,15 @@ module Fluent::Plugin
       key = get_key_from(record)
       value = get_value_from(record)
       score = get_score_from(record, time)
-      @redis.zadd key, score, value
+      if @collision_policy
+        if @collision_policy == 'NX'
+          @redis.zadd(key, score, value, :nx => true)
+        elsif @collision_policy == 'XX'
+          @redis.zadd(key, score, value, :xx => true)
+        end
+      else
+        @redis.zadd(key, score, value)
+      end
 
       set_key_expire key
       if 0 < @value_expire

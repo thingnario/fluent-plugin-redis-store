@@ -43,7 +43,7 @@ For _key_, the plugin supports either way;
    type redis_store
    key userdata
    ```
-   
+
 2. Lookup a key string in every event data by a lookup path.  
    If event data have structured data like
 
@@ -83,7 +83,12 @@ To determine what _value_ in every event data to be srtored, you have two option
 Installation
 ------------
 
-    /usr/lib64/fluent/ruby/bin/fluent-gem install fluent-plugin-redis-store
+```bash
+fluent-gem install fluent-plugin-redis-store
+
+# or if you are using td-agent:
+td-agent-gem install fluent-plugin-redis-store
+```
 
 Configuration
 -------------
@@ -92,7 +97,7 @@ Configuration
 
 | Key        | Type   | Required?   |                  Default | Description                                       |
 | :----      | :----- | :---------- | :----------------------- | :------------                                     |
-| `host`      | string | Optional    | 127.0.0.1               | host name of Redis server                               |
+| `host`     | string | Optional    |                127.0.0.1 | host name of Redis server                         |
 | `port`     | int    | Optional    |                     6379 | port number of Redis server                       |
 | `password` | string | Optional    |                          | password for Redis connection                     |
 | `path`     | string | Optional    |                          | To connect via Unix socket, try '/tmp/redis.sock' |
@@ -101,17 +106,17 @@ Configuration
 
 ### common options for storages
 
-| Key           | Type   | Default                  | Description                                          |
-| :----         | :----- | :----------------------- | :------------                                        |
-| `key`         | string |                          | Fixed _key_ used to store(publish) in Redis          |
-| `key_path`    | string |                          | path to lookup for _key_ in the event data           |
-| `key_prefix`  | string |                          | prefix of _key_                                      |
-| `key_suffix`  | string |                          | suffix of _key_                                      |
-| `value_path`  | string | (whole event data)       | path to lookup for _value_ in the event data         |
-| `store_type`  | string | zset                     | `string`/`list`/`set`/`zset`/`publish`               |
-| `format_type` | string | plain                    | format type for _value_ (`plain`/`json`/`msgpack`)   |
-| `key_expire`  | int    | -1                       | If set, the key will be expired in specified seconds |
-| `flush_interval`  | time    | 1                       | Time interval which events will be flushed to Redis |
+| Key              | Type   | Default                  | Description                                          |
+| :----            | :----- | :----------------------- | :------------                                        |
+| `key`            | string |                          | Fixed _key_ used to store(publish) in Redis          |
+| `key_path`       | string |                          | path to lookup for _key_ in the event data           |
+| `key_prefix`     | string |                          | prefix of _key_                                      |
+| `key_suffix`     | string |                          | suffix of _key_                                      |
+| `value_path`     | string | (whole event data)       | path to lookup for _value_ in the event data         |
+| `store_type`     | string | zset                     | `string`/`list`/`set`/`zset`/`publish`               |
+| `format_type`    | string | plain                    | format type for _value_ (`plain`/`json`/`msgpack`)   |
+| `key_expire`     | int    | -1                       | If set, the key will be expired in specified seconds |
+| `flush_interval` | time   | 1                        | Time interval which events will be flushed to Redis  |
 
 Note: either `key` or `key_path` is required.
 
@@ -134,10 +139,11 @@ No more options than common options.
 
 ### `zset` storage specific options
 
-| Key            | Type   | Default                  | Description                                  |
-| :----          | :----- | :----------------------- | :------------                                |
-| `score_path`   | string | (_time_ of log event)    | path to lookup for _score_ in the event data |
-| `value_expire` | int    |                          | value expiration in seconds                  |
+| Key                 | Type   | Default                  | Description                                                             |
+| :----               | :----- | :----------------------- | :------------                                                           |
+| `score_path`        | string | (_time_ of log event)    | path to lookup for _score_ in the event data                            |
+| `collision_policy`  | string | (nil)                    | Only update elements that already exist (XX) or add a new element (NX)  |
+| `value_expire`      | int    |                          | value expiration in seconds                                             |
 
 If `value_expire` is set, the plugin assumes that the _score_ in the **SortedSet** is
 based on *timestamp* and it deletes expired _members_ every after new event data arrives.
