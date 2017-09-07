@@ -5,6 +5,14 @@ Redis Output Plugin For fluentd
 [Fluentd]: http://fluentd.org/
 [Redis]: http://redis.io/
 
+Requirements
+------------
+
+| fluent-plugin-redis-store | fluentd | ruby |
+|------------------------|---------|------|
+| >= 0.2.0 | >= v0.14.0 | >= 2.1 |
+|  < 0.2.0 | >= v0.12.0 | >= 1.9 |
+
 Background
 ----------
 
