@@ -32,6 +32,7 @@ Currently the plugin supports following Redis commands:
 - **sadd** by `set` type
 - **zadd** by `zset` type
 - **publish** by `publish` type
+- **merge** by `json` type
 
 #### Supported _value_ format
 
@@ -121,7 +122,7 @@ Configuration
 | `key_prefix`     | string |                          | prefix of _key_                                      |
 | `key_suffix`     | string |                          | suffix of _key_                                      |
 | `value_path`     | string | (whole event data)       | path to lookup for _value_ in the event data         |
-| `store_type`     | string | zset                     | `string`/`list`/`set`/`zset`/`publish`               |
+| `store_type`     | string | zset                     | `string`/`list`/`set`/`zset`/`publish`/`merge`               |
 | `format_type`    | string | plain                    | format type for _value_ (`plain`/`json`/`msgpack`)   |
 | `key_expire`     | int    | -1                       | If set, the key will be expired in specified seconds |
 | `flush_interval` | time   | 1                        | Time interval which events will be flushed to Redis  |
